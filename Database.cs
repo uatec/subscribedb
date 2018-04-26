@@ -3,18 +3,6 @@ using System.Collections.Generic;
 
 namespace SubscribeDb
 {
-    public class Change
-    {
-        public Change(string id, string value)
-        {
-            Id = id;
-            Value = value;
-        }
-
-        public string Id { get; }
-        public string Value { get; }
-    }
-
     // TODO: Data Store IOC
     public static class Database
     {
@@ -28,11 +16,24 @@ namespace SubscribeDb
 
         public static void Put(string id, string value)
         {
+            ChangeType changeType = ChangeType.Create;
+
+            if ( data.ContainsKey(id) )
+            {
+                changeType = ChangeType.Update;
+            }
+
             data[id] = value;
-            changes.Add(new Change(id, value));
+            changes.Add(new Change(changeType, id, value));
         }
 
-        // TODO: Delete functionality
+        public static string Delete(string id)
+        {
+            var value = data[id];
+            data.Remove(id);
+            changes.Add(new Change(ChangeType.Delete, id, value));            
+            return value;
+        }
 
         public static IEnumerable<Change> Watch(string id)
         {

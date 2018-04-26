@@ -66,7 +66,16 @@ namespace SubscribeDb
                 return context.Response.WriteAsync("ok");
             });
 
-            // TODO: Delete operations
+            routeBuilder.MapDelete(path, async context =>
+            {
+                string id = context.GetRouteValue("id") as string;
+
+                // TODO: Not Found
+                T value = FromDataRecord<T>(Database.Delete(id));
+                
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(value));
+            });
+
             // TODO: Correct Put/Post behaviour
 
             var routes = routeBuilder.Build();
